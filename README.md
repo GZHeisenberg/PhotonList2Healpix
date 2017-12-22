@@ -47,4 +47,3 @@ Affinchè il software funzioni correttamente necessità di un file di configuraz
 	
 	fovradmax: Max off-axis angle (degrees)
 	
-	emax: energia massima di osservazione
