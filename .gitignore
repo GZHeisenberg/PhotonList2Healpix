@@ -1,0 +1,65 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Folders
+bin/*
+Dataset1000/*
+obj/*
+OpenCvLibs/*
+AgileRealImages/*
+MAPPE_PER_TEST/*
+test/*
+maps/*
+mapsParmi/*
+RealImages/*
+# Files
+*.cbp
+*.depend
+*.layout
+*.png
+*.cts
+*.txt
+*.cts.gz
+*.swp
+*.save
+*.exp
+*.gz
+*.fits
+src/ExpRatioEvaluator.cpp
+include/ExpRatioEvaluator.h
+include/MapConverter.h
+COMANDI_UTILI_GIT_BRANCH
+src/MapConverter.cpp
+version
+run.sh
+runNoExp.sh
