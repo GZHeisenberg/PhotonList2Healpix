@@ -21,7 +21,7 @@ int HealpixMapMaker :: EvalCountsHealpix (const char * outfile, EvtReader * evtR
 	
 	const char *_outfile = outfile;
 	string OutFilePath(_outfile);
-	OutFilePath = "./HEALPIX_MAPS/" + OutFilePath;
+	OutFilePath = "./" + OutFilePath;
 	
     int status = 0;
 
