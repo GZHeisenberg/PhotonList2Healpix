@@ -34,8 +34,8 @@ const PilDescription paramsDescr[] = {
     { PilString, "outfile", "Output file name" },
     { PilString, "evtType", "Event telescope source" },
     { PilString, "photonListPath", "Path of photon list"},
-   
-    
+
+
     //i successivi 5 sono relativi alla proiezione nel cielo
     { PilReal, "mdim", "Size of Map (degrees)" },
     { PilReal, "mres", "Heaplix resolution (level)" },
@@ -59,100 +59,115 @@ const PilDescription paramsDescr[] = {
 int main(int argc, char *argv[])
 {
     cout << startString << endl;
-    
+
     PilParams params(paramsDescr);
-    
+
     if (!params.Load(argc, argv))
         return EXIT_FAILURE;
-        
-	cout << endl << "INPUT PARAMETERS:" << endl;
+
+    cout << endl << "INPUT PARAMETERS:" << endl;
     params.Print();
-    
- 	
+
+    // this file is for...
     char selectionFilename[FLEN_FILENAME];
-    char templateFilename[FLEN_FILENAME];
     tmpnam(selectionFilename);
+
+    // this file is for...
+    char templateFilename[FLEN_FILENAME];
     tmpnam(templateFilename);
-    
-    
-    int status;
-    
-    Intervals intervals;
- 	Interval intv(params["tmin"],params["tmax"]);
-    intervals.Add(intv);
-	
-	// Data to insert in EVT.index
-	const char * evtFile = "./INDEX/EVT.index";	
-	const char * _photonListPath = params["photonListPath"];
-	double _tmin = params["tmin"];
-	double _tmax = params["tmax"];
-	
-	// Create EVT.index	
-	string _pLP(_photonListPath);
-	string input2write = _pLP +" "+ to_string(_tmin) + " " + to_string(_tmax);
-	
-	FileWriter :: write2File(evtFile,input2write);
-    
-    cout << "EVT file created"<< endl;
-	
-	
-	EvtReader * evtReader;
-	EvtParams * readerParams; // emin, emax, phasecode, filtercode, tmin, tmax
 
-		
-	HealpixParams healpix2WriteParams(params["mdim"],params["mres"],params["la"],params["ba"], params["lonpole"]);
 
-	healpix2WriteParams.print();
 
-	
-	string _evtType (params["evtType"]);
-	
-		
-	if( _evtType == "AGILE")
-	{
-		cout << "AGILE selected" << endl;
+    // SERVE? -----------------------------------------------------------------
+  	// Data to insert in EVT.index
+  	const char * evtFile = "./INDEX/EVT.index";
+    const char * _photonListPath = params["photonListPath"];
+    string _pLP(_photonListPath);
+  	double _tmin = params["tmin"];
+  	double _tmax = params["tmax"];
 
-		evtReader    = new AgileEvtReader();
+  	// Create EVT.index
+  	string input2write = _pLP +" "+ to_string(_tmin) + " " + to_string(_tmax);
 
-		readerParams  = new AgileEvtParams( 	evtFile,
-							params["emin"],
-							params["emax"],
-							params["albrad"],
-							params["fovradmin"],
-							params["fovradmax"],
-							params["phasecode"],
-							params["filtercode"],
-							params["tmin"],
-							params["tmax"]
-						);
-	}
-	else if( _evtType == "CTA")
-	{
-		cout << "CTA selected" << endl;
+  	FileWriter :: write2File(evtFile,input2write);
+    cout << "\nEVT file created!\n"<< endl;
+    // -------------------------------------------------------------------------
 
-		evtReader    = new CtaEvtReader();
 
-		readerParams = new CtaEvtParams(	evtFile,
-							params["emin"],
-							params["emax"],
-							params["tmin"],
-							params["tmax"]
-						);
-	}
-	
+  	EvtReader * evtReader;
+  	EvtParams * readerParams; // emin, emax, phasecode, filtercode, tmin, tmax
 
-	evtReader->readEvtFile(selectionFilename, templateFilename,readerParams);
-	
-	status = HealpixMapMaker :: EvalCountsHealpix(	params["outfile"],
-							evtReader, 
-							readerParams, 
-							healpix2WriteParams, 
-							selectionFilename, 
-							templateFilename, 
-							intervals
-						);
-	cout << "Healpix status: " << status;
-	cout << endString << endl;
-	return 0;
-}	
 
+  	HealpixParams healpix2WriteParams(params["mdim"],params["mres"],params["la"],params["ba"], params["lonpole"]);
+
+  	healpix2WriteParams.print();
+
+
+  	string _evtType (params["evtType"]);
+
+
+  	if( _evtType == "AGILE")
+  	{
+  		cout << "AGILE selected" << endl;
+
+  		evtReader    = new AgileEvtReader();
+
+  		readerParams  = new AgileEvtParams( evtFile,
+                            							params["emin"],
+                            							params["emax"],
+                            							params["albrad"],
+                            							params["fovradmin"],
+                            							params["fovradmax"],
+                            							params["phasecode"],
+                            							params["filtercode"],
+                            							params["tmin"],
+                            							params["tmax"]
+                            						);
+  	}
+  	else if( _evtType == "CTA")
+  	{
+  		cout << "CTA selected" << endl;
+
+  		evtReader = new CtaEvtReader();
+
+  		readerParams = new CtaEvtParams(	evtFile,
+                          							params["emin"],
+                          							params["emax"],
+                          							params["tmin"],
+                          							params["tmax"]
+                          						);
+  	}
+
+
+  	evtReader->readEvtFile(selectionFilename, templateFilename, readerParams);
+
+
+
+
+
+  	int status = HealpixMapMaker :: EvalCountsHealpix(	params["outfile"],
+                                          							evtReader,
+                                          							readerParams,
+                                          							healpix2WriteParams,
+                                          							selectionFilename,
+                                          							//templateFilename,
+                                                        _tmin,
+                                                        _tmax
+                                          						);
+
+    if(status > 0)
+    {
+      char err_text[50];
+      fits_get_errstatus(status, &err_text[0]);
+      cout << "Errors from EvalCountsHealpix (cfitsio error=" << err_text << ")";
+
+    }
+    else
+    {
+      cout << "No errors from EvalCountsHealpix (status=" << status << ")";
+    }
+
+
+  	cout << endString << endl;
+  	return 0;
+}

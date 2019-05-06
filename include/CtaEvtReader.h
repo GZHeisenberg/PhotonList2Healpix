@@ -10,7 +10,7 @@
 #include <iostream>
 #include <string>
 #include <Selection.h>
-#include <PilParams.h> 
+#include <PilParams.h>
 #include <FitsUtils.h>
 #include <sstream>
 
@@ -24,10 +24,8 @@ using std::endl;
 class CtaEvtReader : public EvtReader
 {
 	public:
-		
+
 		CtaEvtReader() {};
 		string EvtExprString(const Intervals &intvs, double emin, double emax);
-	        void readEvtFile(const char *selectionFilename,  const char *templateFilename,EvtParams* evtParams);
+    void readEvtFile(const char *selectionFilename,  const char *templateFilename,EvtParams* evtParams);
 };
-
-

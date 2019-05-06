@@ -31,8 +31,8 @@ using namespace std;
 class HealpixMapMaker
 {
 	public:
-	
-		static int EvalCountsHealpix(const char * outfile, EvtReader * evtReader, EvtParams* evtParams, HealpixParams healpix2WriteParams, const char *selectionFilename,  const char *templateFilename, Intervals intervals);
+
+		static int EvalCountsHealpix(const char * outfile, EvtReader * evtReader, EvtParams* evtParams, HealpixParams healpix2WriteParams, const char *selectionFilename, double tmin, double tmax); //const char *templateFilename,
 
 	private:
 

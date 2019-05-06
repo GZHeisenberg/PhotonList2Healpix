@@ -1,49 +1,70 @@
 # PhotonList2Healpix v0.0.1
 
-Il software genera una mappa Healpix partendo da una photons list che può provenire da contesti scientifici diversi. Le photons list attualmente supportate sono quelle generate da AGILE o CTA.
+The PhotonList2Healpix software takes in input a photon list (CTA or AGILE) and return as output an Healpix map.
 
-Affinchè il software funzioni correttamente necessità di un file di configurazione EVT.index. Questo file al momento viene generato in run-time tramite i seguenti parametri presi in input:
+The software requires a configuration file named EVT.index placed in INDEX directory.
+This file is created at run-time using following input parameters:
 
 	- photonListPath ( "./EVT_MAPS/ag1608151200_1608311200_STD1Kal_FM.EVT.gz" )
-	
+
 	- tmin ( 398347132 )
-	
+
 	- tmax ( 399729532 )
 
+## Dependencies
 
-### Input:
+The following dependencies are needed:
 
-	outfile: nome che sarà associato alla mappa healpix generata del software (la mappa sarà salvata all'interno della directory HEALPIX_MAPS)
-	
-	evtType: indica la provenienza della photon list (AGILE o CTA)
-	
-	photonListPath: indica il path della photon list di partenza
-	
-	mdim: indica la dimensione della mappa healpix che sarà creata (espressa in gradi)
-	
-	mres: indica la risoluzione della pixelizzazione healpix
-	
-	la: indica la longitudine del centro della mappa healpix
-	
-	ba: indica la latitudine del centro della mappa healpix
-	
-	lonpole: indica la rotazine della mappa healpix (espressa in gradi)
-	
-	albrad: radius of earth albedo (degrees)
-	
-	phasecode: orbital phase code
-	
-	filtercode: rappresenta un codice di filtraggio dei fenomeni all'interno delle photon list (0 per photon list CTA, 5 per photon list AGILE per seleziore i soli eventi gamma)
-	
-	tmin: tempo iniziale degli eventi da osservare ( parametro di selezione degli eventi dalla photon list)
-	
-	tmax: tempo finale degli eventi da osservare ( parametro di selezione degli eventi dalla photon list)
-	
-	emin: energia minima degli eventi da osservare ( parametro di selezione degli eventi dalla photon list)
-	
-	emax: energia massima degli eventi da osservare ( parametro di selezione degli eventi dalla photon list)
-	
-	fovradmin: Min off-axis angle (degrees)
-	
-	fovradmax: Max off-axis angle (degrees)
-	
+	* cfitsio
+	* pil
+	* agile
+	* healpix-3.31-cxx
+
+## Use
+
+On inaf server load the following modues:
+
+	module load agile-B24-r5
+	module load healpix-3.31-cxx
+
+Export path to pil params file configuration
+
+```bash
+	 export PFILES=~/PhotonList2HealpixTask/PhotonList2Healpix/conf
+```
+
+#### Input:
+
+	outfile: HEALPix output file name;
+
+	evtType: indicates if the input photon list is AGILE or CTA;
+
+	photonListPath: indicates the input photon list path;
+
+	mdim: indicates the HEALPix output map size (expressed in degrees);
+
+	mres: indicates the HEALPix output map resolution;
+
+	la: indicates the longitudinal coordinate of the center of the HEALPix output map;
+
+	ba: indicates the latitude coordinate of the center of the HEALPix output map;
+
+	lonpole: indicates the rotation of the HEALPix map (expressed in degrees);
+
+	albrad: radius of earth albedo (expressed in degrees);
+
+	phasecode: orbital phase code;
+
+	filtercode: code used to select the particular event type ( 0 to select all photon list event, used for CTA photon list, 5 to select only gamma event, used for AGILE photon list);
+
+	tmin: observation start time ( selection parameter to apply at the photon list );
+
+	tmax: observation end time ( selection parameter to apply at the photon list );
+
+	emin: the minimum observation energy of the events ( selection parameter to apply at the photon list );
+
+	emax: the maximum observation energy of the events ( selection parameter to apply at the photon list );
+
+	fovradmin: Min off-axis angle ( expressed in degrees);
+
+	fovradmax: Max off-axis angle (expressed in degrees);
