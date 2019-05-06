@@ -35,7 +35,7 @@ Export path to pil params file configuration
 	 export PFILES=~/PhotonList2HealpixTask/PhotonList2Healpix/conf
 ```
 
-#### Input:
+### Input
 
 	outfile: HEALPix output file name;
 

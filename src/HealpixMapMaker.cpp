@@ -44,7 +44,6 @@ int HealpixMapMaker :: EvalCountsHealpix (const char * outfile, EvtReader * evtR
 
   cout << "[HealpixMapMaker] Evaluating counts.." << endl;
 
-  int totalCounts = 0;
 
 	// mres is the resolution level and NEST is chosen for seek of efficency
   Healpix_Map<int> map((int)healpix2WriteParams.mres,NEST);
