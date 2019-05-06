@@ -1,5 +1,7 @@
 # PhotonList2Healpix v0.0.1
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/67a1b7d4dec34f42a8b0ce331d8e57c8)](https://app.codacy.com/app/GZHeisenberg/PhotonList2Healpix?utm_source=github.com&utm_medium=referral&utm_content=GZHeisenberg/PhotonList2Healpix&utm_campaign=Badge_Grade_Dashboard)
+
 Il software genera una mappa Healpix partendo da una photons list che può provenire da contesti scientifici diversi. Le photons list attualmente supportate sono quelle generate da AGILE o CTA.
 
 Affinchè il software funzioni correttamente necessità di un file di configurazione EVT.index. Questo file al momento viene generato in run-time tramite i seguenti parametri presi in input:
