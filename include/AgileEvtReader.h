@@ -28,12 +28,10 @@ class AgileEvtReader : public EvtReader
 
 	AgileEvtReader(){}
 
-	// Implements superclass method	
-        void readEvtFile(const char *selectionFilename,  const char *templateFilename,EvtParams* evtParams);
+	// Implements superclass method
+  void readEvtFile(const char *selectionFilename,  const char *templateFilename,EvtParams* evtParams);
 
 };
 
 
 #endif
-
-

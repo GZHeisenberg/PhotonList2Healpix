@@ -10,142 +10,142 @@
 
 #include "HealpixMapMaker.h"
 
-HealpixMapMaker :: HealpixMapMaker () 
+HealpixMapMaker :: HealpixMapMaker ()
 {
 	// constructor
 }
 
-int HealpixMapMaker :: EvalCountsHealpix (const char * outfile, EvtReader * evtReader, EvtParams* evtParams, HealpixParams healpix2WriteParams, const char *selectionFilename,  const char *templateFilename, Intervals intervals) {
-	
+int HealpixMapMaker :: EvalCountsHealpix (const char * outfile, EvtReader * evtReader, EvtParams* evtParams, HealpixParams healpix2WriteParams, const char *selectionFilename, double tmin, double tmax) { // const char *templateFilename,
+
 	cout << "Healpix Map Maker" << endl;
-	
+
+  long mxdim = long(healpix2WriteParams.mdim / healpix2WriteParams.mres + 0.1); // dimension (in pixels) of the map
+
+  cout << "mdim: " << healpix2WriteParams.mdim << " mres: " << healpix2WriteParams.mres << " mxdim: " << mxdim << endl;
+
+  int hdutype;
+	int status = 0;
+
+
+	fitsfile* selectionFits;
+  if (fits_open_file(&selectionFits, selectionFilename, READONLY, &status))
+	{
+      cerr << "[HealpixMapMaker] ERROR opening selection file " << selectionFilename << endl;
+      return status;
+  }
+	// int fits_movabs_hdu(fitsfile *fptr, int hdunum, int *hdutype, int *status) ==> Moves to the specified absolute HDU number in the FITS file.
+	// In the case of the AGILE/CTA photon list we have 3 HDU (Primary, EVENTS and GTI). We take hdunum = 2 ==> EVENTS
+  if (fits_movabs_hdu(selectionFits, 2, &hdutype, &status))
+	{
+		cerr << "[HealpixMapMaker] ERROR moving to HDU" << endl;
+		return status;
+	}
+	cout << "[HealpixMapMaker] Moved to hdutype " << hdutype << " of the selection file " << selectionFilename << endl;
+
+  cout << "[HealpixMapMaker] Evaluating counts.." << endl;
+
+  int totalCounts = 0;
+
+	// mres is the resolution level and NEST is chosen for seek of efficency
+  Healpix_Map<int> map((int)healpix2WriteParams.mres,NEST);
+
+	//initialize the healpix map to all zeros
+ 	for( int i = 0; i < map.Npix(); i++)
+	{
+		map[i]=0;
+	}
+
+	long nrows;
+
+	if (fits_get_num_rows(selectionFits, &nrows, &status)) {
+		cerr << "[HealpixMapMaker] ERROR counting the number of rows from selection file "<< selectionFilename << endl;
+		return status;
+	}
+
+	int raColumn, decColumn;
+	if (fits_get_colnum(selectionFits, 1, (char*)"RA", &raColumn, &status)) // int fits_get_colnum(fitsfile *fptr, int casesen, char *template, int *colnum, int *status)
+	{
+		cerr << "[HealpixMapMaker] ERROR getting the index of the column RA" << endl;
+		return status;
+	}
+
+	if (fits_get_colnum(selectionFits, 1, (char*)"DEC", &decColumn, &status)) // int fits_get_colnum(fitsfile *fptr, int casesen, char *template, int *colnum, int *status)
+	{
+		cerr << "[HealpixMapMaker] ERROR getting the index of the column DEC" << endl;
+		return status;
+	}
+
+
+	#ifdef DEBUG
+	cout <<"[HealpixMapMaker] Index of coloumn RA: " << raColumn << endl;
+	cout <<"[HealpixMapMaker] Index of coloumn DEC: " << decColumn << endl;
+	#endif
+
+	double ra, dec, l, b = 0;	//the,, x, y, i, ii = 0
+
+	// This represent the coordinates of map center but at the moment are not used!
+	double baa = healpix2WriteParams.baa * DEG2RAD;
+	double laa = healpix2WriteParams.laa * DEG2RAD;
+
+	for ( long k = 0; k<nrows; k++ ) {
+
+			/*
+				int fits_read_col(fitsfile *fptr, int datatype, int colnum, long firstrow, long firstelem, long nelements, void *nulval, void *array, int *anynul, int *status)
+
+				Write or read elements in column number colnum, starting with row
+				firstsrow and element firstelem (if it is a vector column). firstelem
+				is ignored if it is a scalar column. The nelements number of elements
+				are read or written continuing on successive rows of the table if necessary.
+				array is the address of an array which either contains the values to be written,
+				or will hold the returned values that are read. When reading, array
+				must have been allocated large enough to hold all the returned values.
+				// nulval = NULL => no checks will be made for undefined values when reading the column.
+			*/
+			if (fits_read_col(selectionFits, TDOUBLE, raColumn, k+1, 1, 1, NULL, &ra, NULL, &status))
+			{
+				cerr << "[HealpixMapMaker] ERROR on reading the column RA of the template file" << endl;
+				return status;
+			}
+			if (fits_read_col(selectionFits, TDOUBLE, decColumn, k+1, 1, 1, NULL, &dec, NULL, &status))
+			{
+				cerr << "[HealpixMapMaker] ERROR on reading the column DEC of the template file" << endl;
+				return status;
+			}
+			Euler(ra, dec, &l, &b, 1);
+			l *= DEG2RAD;
+			b *= DEG2RAD;
+
+			// Encodes an angular position on unitary sphere as colatitude and longitude
+			pointing point = pointing((M_PI/2)-b,l);
+			int index = map.ang2pix(point);
+
+			// Increment the count
+			map[index]++;
+
+	}
+
+  cout << "[HealpixMapMaker] Ending Healpix evaluation. Writing the Healpix map on file." << endl;
+
 	const char *_outfile = outfile;
 	string OutFilePath(_outfile);
 	OutFilePath = "./" + OutFilePath;
-	
-    int status = 0;
 
-    long mxdim = long(healpix2WriteParams.mdim / healpix2WriteParams.mres + 0.1); // dimension (in pixels) of the map
-    
-
-
-    cout << "mdim: " << healpix2WriteParams.mdim << " mres: " << healpix2WriteParams.mres << " mxdim: " << mxdim << endl; 
-    
-    
-	vector< vector<int> > counts;
-
-    long npixels = mxdim * mxdim;
-    counts.resize(intervals.Count());
-
-    //crea l'array di pixels
-    for (int i=0; i < intervals.Count(); i++) {
-		
-        counts[i].resize(npixels);
-        for (int j=0; j < npixels; j++)
-            counts[i][j] = 0;
-    }
-
-    int hdutype;
-    fitsfile* selectionFits;
-        
-    if (fits_open_file(&selectionFits, selectionFilename, READONLY, &status)) {
-        cerr << "ERROR opening selection file " << selectionFilename << endl;
-        return -1;
-    }
-    fits_movabs_hdu(selectionFits, 2, &hdutype, &status);
-
-    fitsfile* templateFits;
-    if (fits_open_file(&templateFits, templateFilename, READWRITE, &status)) {
-        cerr << "ERROR opening template file " << templateFilename << endl;
-        return -1;
-    }
-    fits_movabs_hdu(templateFits, 2, &hdutype, &status);
-    
-    long oldnrows;
-    fits_get_num_rows(templateFits, &oldnrows, &status);
-    fits_delete_rows(templateFits, 1, oldnrows, &status);
-
-    cout << "Evaluating counts.." << endl;
-    
+	if( remove( OutFilePath.c_str() ) != 0 )
+		cout << "[HealpixMapMaker] Error deleting the file" << OutFilePath << endl;
+	else
+		cout << "[HealpixMapMaker] " << OutFilePath << " removed." << endl;
 
 
-    int totalCounts = 0;
-    int Nside = pow(2,healpix2WriteParams.mres);
-    Healpix_Map<int> map((int)healpix2WriteParams.mres,NEST); // NEST is chosen for seek of efficency
-    
-    cout << "mres = " << healpix2WriteParams.mres << endl;
-        
- 	for( int i = 0; i < map.Npix(); i++){ 	//initialize the healpix map to all zeros
-		
-		map[i]=0;
-		
-	}
-	
-    for (int intvIndex = 0; intvIndex < intervals.Count(); intvIndex++) {
-		
+	fitshandle handle;
+	handle.create(OutFilePath);
 
-
-        cout << "Interval # " << intvIndex << endl;
-        
-
-        Intervals sIntv;
-        sIntv.Add(intervals[intvIndex]);
-        string selExpr = selection::TimesExprString(sIntv);
-        
-
-
-        cout << "selExpr: " << selExpr << endl;
-        
-
-        
-        fits_select_rows(selectionFits, templateFits, (char*)selExpr.c_str(), &status);
-        long nrows;
-        fits_get_num_rows(templateFits, &nrows, &status);
-        
-
-
-        cout << "Reading all " << nrows << " rows" << endl;
-        
-
-		int raColumn, decColumn;
-        fits_get_colnum(templateFits, 1, (char*)"RA", &raColumn, &status);
-        fits_get_colnum(templateFits, 1, (char*)"DEC", &decColumn, &status);
-
-        double ra, dec, l, b, the, x, y, i = 0, ii = 0;
-        double baa = healpix2WriteParams.baa * DEG2RAD;
-        double laa = healpix2WriteParams.laa * DEG2RAD;
-        
-        for ( long k = 0; k<nrows; k++ ) {
-			
-            fits_read_col(templateFits, TDOUBLE, raColumn, k+1, 1, 1, NULL, &ra, NULL, &status);
-            fits_read_col(templateFits, TDOUBLE, decColumn, k+1, 1, 1, NULL, &dec, NULL, &status);
-            Euler(ra, dec, &l, &b, 1);
-            l *= DEG2RAD;
-            b *= DEG2RAD;
-
-			pointing point = pointing((M_PI/2)-b,l); // Encodes an angular position on unitary sphere as colatitude and longitude
-			int index = map.ang2pix(point);
-			map[index]++;
-
-        }
-        
-        if (nrows > 0)
-            fits_delete_rows(templateFits, 1, nrows, &status);
-    }
-    
-
-    
-    cout << "Ending Healpix evaluation " << endl;
-
-	// Save Healpix map
-	remove(OutFilePath.c_str());
-	fitshandle handle = fitshandle() ;
-	handle.create(OutFilePath.c_str());
 	write_Healpix_map_to_fits(handle,map,PLANCK_INT64);
+
+	cout << "[HealpixMapMaker] Map saved." << endl;
+
 	fits_close_file(selectionFits, &status);
-	fits_close_file(templateFits, &status);
 
-    return status;
+	cout <<"[HealpixMapMaker] SelectionFile" << selectionFilename <<  " closed." << endl; //" and templateFile " <<templateFilename <<
+
+  return status;
 }
-	
-

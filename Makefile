@@ -21,8 +21,8 @@ SHELL = /bin/sh
 ####### 1) Project names and system
 
 SYSTEM= $(shell gcc -dumpmachine)
-#ice, ctarta, mpi, cfitsio
-LINKERENV= cfitsio, pil, wcs, agile, opencv, healpix
+#ice, ctarta, mpi, cfitsio, opencv
+LINKERENV= cfitsio, pil, wcs, agile, healpix
 
 # Applications
 AG_EXE = PhotonList2Healpix
@@ -79,7 +79,7 @@ DOC_DIR = ref
 DOXY_SOURCE_DIR = code_filtered
 EXE_DESTDIR  = bin
 LIB_DESTDIR = lib
-# CONF_DIR=conf
+CONF_DIR=conf
 ICON_DIR = ui
 
 ####### 4) Compiler, tools and options
@@ -106,7 +106,7 @@ ifneq (, $(findstring wcs, $(LINKERENV)))
 endif
 ifneq (, $(findstring opencv, $(LINKERENV)))
     ifeq (, $(findstring -I $(OPENCV)/include, $(CXXFLAGS)))
-        CXXFLAGS += -I $(OPENCV)/include 
+        CXXFLAGS += -I $(OPENCV)/include
 	CXXFLAGS += -std=c++11
     endif
     LIBS += -L$(OPENCV)/lib -lopencv_core -lopencv_highgui -lopencv_imgproc
@@ -126,10 +126,10 @@ ifneq (, $(findstring cfitsio, $(LINKERENV)))
     LIBS += -L$(CFITSIO)/lib -lcfitsio
 endif
 ifneq (, $(findstring healpix, $(LINKERENV)))
-    ifeq (,$(findstring -I $(HEALPIX)/include, $(CXXFLAGS)))
-        CXXFLAGS += -I $(HEALPIX)/include
+    ifeq (,$(findstring -I $(HEALPIX_INCDIR), $(CXXFLAGS)))
+        CXXFLAGS += -I $(HEALPIX_INCDIR)
     endif
-    LIBS += -L$(HEALPIX)/lib -lhealpix_cxx -lsharp -lfftpack -lcxxsupport -lc_utils
+    LIBS += -L$(HEALPIX_LIBDIR) -lhealpix_cxx -lsharp -lfftpack -lcxxsupport -lc_utils
 endif
 
 LINK     = $(CXX)
@@ -210,7 +210,7 @@ exe: makeobjdir $(OBJECTS)
 
 staticlib: makelibdir makeobjdir $(OBJECTS)
 	test -d $(LIB_DESTDIR) || mkdir -p $(LIB_DESTDIR)
-	$(DEL_FILE) $(LIB_DESTDIR)/$(TARGETA) 
+	$(DEL_FILE) $(LIB_DESTDIR)/$(TARGETA)
 	$(AR) $(LIB_DESTDIR)/$(TARGETA) $(OBJECTS_DIR)/*.o
 
 dynamiclib: makelibdir makeobjdir $(OBJECTS)
