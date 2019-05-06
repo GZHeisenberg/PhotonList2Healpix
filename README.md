@@ -1,5 +1,7 @@
 # PhotonList2Healpix v0.0.1
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/67a1b7d4dec34f42a8b0ce331d8e57c8)](https://app.codacy.com/app/GZHeisenberg/PhotonList2Healpix?utm_source=github.com&utm_medium=referral&utm_content=GZHeisenberg/PhotonList2Healpix&utm_campaign=Badge_Grade_Dashboard)
+
 The PhotonList2Healpix software takes in input a photon list (CTA or AGILE) and return as output an Healpix map.
 
 The software requires a configuration file named EVT.index placed in INDEX directory.
