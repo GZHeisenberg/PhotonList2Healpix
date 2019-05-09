@@ -9,6 +9,7 @@
 
 #include <string>
 
+#include "HduHandler.hpp"
 #include "AgileEvtReader.h" // -> imports EvtReader too
 #include "CtaEvtReader.h" // -> imports EvtReader too
 #include "HealpixParams.h" // to remove
@@ -139,10 +140,7 @@ int main(int argc, char *argv[])
   	}
 
 
-  	evtReader->readEvtFile(selectionFilename, templateFilename, readerParams);
-
-
-
+    evtReader->readEvtFile(selectionFilename, templateFilename, readerParams);
 
 
   	int status = HealpixMapMaker :: EvalCountsHealpix(	params["outfile"],
@@ -150,7 +148,6 @@ int main(int argc, char *argv[])
                                           							readerParams,
                                           							healpix2WriteParams,
                                           							selectionFilename,
-                                          							//templateFilename,
                                                         _tmin,
                                                         _tmax
                                           						);
@@ -166,6 +163,10 @@ int main(int argc, char *argv[])
     {
       cout << "No errors from EvalCountsHealpix (status=" << status << ")";
     }
+
+    HduHandler * hduHandlerOutFile;
+
+    hduHandlerOutFile->writeKeysValue(params["outfile"], 2, "COORDSYS", "C       ","Ecliptic, Galactic or Celestial (equatorial)");
 
 
   	cout << endString << endl;

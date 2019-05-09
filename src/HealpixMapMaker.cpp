@@ -23,11 +23,15 @@ int HealpixMapMaker :: EvalCountsHealpix (const char * outfile, EvtReader * evtR
 
   cout << "mdim: " << healpix2WriteParams.mdim << " mres: " << healpix2WriteParams.mres << " mxdim: " << mxdim << endl;
 
-  int hdutype;
+  int hdutype = 0;
 	int status = 0;
+	int keysexist=0;
+	int morekeys =0;
 
 
 	fitsfile* selectionFits;
+
+	cout << "\n[HealpixMapMaker] selectionFilename: " << selectionFilename <<"\n\n"<< endl;
   if (fits_open_file(&selectionFits, selectionFilename, READONLY, &status))
 	{
       cerr << "[HealpixMapMaker] ERROR opening selection file " << selectionFilename << endl;
@@ -35,7 +39,8 @@ int HealpixMapMaker :: EvalCountsHealpix (const char * outfile, EvtReader * evtR
   }
 	// int fits_movabs_hdu(fitsfile *fptr, int hdunum, int *hdutype, int *status) ==> Moves to the specified absolute HDU number in the FITS file.
 	// In the case of the AGILE/CTA photon list we have 3 HDU (Primary, EVENTS and GTI). We take hdunum = 2 ==> EVENTS
-  if (fits_movabs_hdu(selectionFits, 2, &hdutype, &status))
+
+	if (fits_movabs_hdu(selectionFits, 2, &hdutype, &status))
 	{
 		cerr << "[HealpixMapMaker] ERROR moving to HDU" << endl;
 		return status;
@@ -83,8 +88,10 @@ int HealpixMapMaker :: EvalCountsHealpix (const char * outfile, EvtReader * evtR
 	double ra, dec, l, b = 0;	//the,, x, y, i, ii = 0
 
 	// This represent the coordinates of map center but at the moment are not used!
-	double baa = healpix2WriteParams.baa * DEG2RAD;
-	double laa = healpix2WriteParams.laa * DEG2RAD;
+	// double baa = healpix2WriteParams.baa * DEG2RAD;
+	// double laa = healpix2WriteParams.laa * DEG2RAD;
+
+	cout << "The center of map coordinates should be: " << healpix2WriteParams.baa << ", " << healpix2WriteParams.laa << endl;
 
 	for ( long k = 0; k<nrows; k++ ) {
 
@@ -110,9 +117,12 @@ int HealpixMapMaker :: EvalCountsHealpix (const char * outfile, EvtReader * evtR
 				cerr << "[HealpixMapMaker] ERROR on reading the column DEC of the template file" << endl;
 				return status;
 			}
+
 			Euler(ra, dec, &l, &b, 1);
 			l *= DEG2RAD;
 			b *= DEG2RAD;
+
+
 
 			// Encodes an angular position on unitary sphere as colatitude and longitude
 			pointing point = pointing((M_PI/2)-b,l);
@@ -140,9 +150,12 @@ int HealpixMapMaker :: EvalCountsHealpix (const char * outfile, EvtReader * evtR
 
 	write_Healpix_map_to_fits(handle,map,PLANCK_INT64);
 
+
+
 	cout << "[HealpixMapMaker] Map saved." << endl;
 
 	fits_close_file(selectionFits, &status);
+
 
 	cout <<"[HealpixMapMaker] SelectionFile" << selectionFilename <<  " closed." << endl; //" and templateFile " <<templateFilename <<
 

@@ -23,7 +23,6 @@
 #include "FitsUtils.h"
 
 
-
 using namespace std;
 
 
