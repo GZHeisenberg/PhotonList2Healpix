@@ -22,22 +22,9 @@ class HduHandler
 {
   public:
     HduHandler();
-    int readHdu(const char * evtPath/*, const char * selectionFilename, const char *templateFilename*/);
+    int readHdu(const char * evtPath);
     int readHduKeysValue(fitsfile* fitsptr, int hdunum);
     int writeKeysValue(const char * evtPath, int hdunum, char * keyname, char * value, char *comment);
-
-
-    // int hdutype = 0;
-  	// int status = 0;
-  	// int keysexist=0;
-  	// int morekeys =0;
-    // int hdunum = 0;
-    // int keynum = 0;
-    // fitsfile* fitsptr;
-
-  private:
-
-
 
 };
 

@@ -25,8 +25,6 @@ int HealpixMapMaker :: EvalCountsHealpix (const char * outfile, EvtReader * evtR
 
   int hdutype = 0;
 	int status = 0;
-	int keysexist=0;
-	int morekeys =0;
 
 
 	fitsfile* selectionFits;

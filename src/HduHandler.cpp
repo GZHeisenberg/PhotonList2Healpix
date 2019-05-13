@@ -21,7 +21,6 @@ int HduHandler::readHdu(const char * evtPath){
 	int keysexist=0;
 	int morekeys =0;
   int hdunum = 0;
-  int keynum = 0;
 
   fitsfile* fitsptr;
 
@@ -111,10 +110,6 @@ int HduHandler::writeKeysValue(const char * evtPath, int hdutype, char * keyname
 
   int status = 0;
   int hdunum = 0;
-
-  // char keyname[20] = "COORDSYS";
-  // char value[20] = "C       ";
-  // char comment[50] = "Ecliptic, Galactic or Celestial (equatorial)";
 
   fitsfile* fitsptr;
 
