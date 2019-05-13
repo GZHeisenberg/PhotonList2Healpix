@@ -9,6 +9,7 @@
 
 #include <string>
 
+#include "HduHandler.hpp"
 #include "AgileEvtReader.h" // -> imports EvtReader too
 #include "CtaEvtReader.h" // -> imports EvtReader too
 #include "HealpixParams.h" // to remove
@@ -78,7 +79,6 @@ int main(int argc, char *argv[])
 
 
 
-    // SERVE? -----------------------------------------------------------------
   	// Data to insert in EVT.index
   	const char * evtFile = "./INDEX/EVT.index";
     const char * _photonListPath = params["photonListPath"];
@@ -87,12 +87,9 @@ int main(int argc, char *argv[])
   	double _tmax = params["tmax"];
 
   	// Create EVT.index
-  	string input2write = _pLP +" "+ to_string(_tmin) + " " + to_string(_tmax);
-
-  	FileWriter :: write2File(evtFile,input2write);
+    string input2write = _pLP +" "+ to_string(_tmin) + " " + to_string(_tmax);
+    FileWriter :: write2File(evtFile,input2write);
     cout << "\nEVT file created!\n"<< endl;
-    // -------------------------------------------------------------------------
-
 
   	EvtReader * evtReader;
   	EvtParams * readerParams; // emin, emax, phasecode, filtercode, tmin, tmax
@@ -100,8 +97,9 @@ int main(int argc, char *argv[])
 
   	HealpixParams healpix2WriteParams(params["mdim"],params["mres"],params["la"],params["ba"], params["lonpole"]);
 
+    #ifdef DEBUG
   	healpix2WriteParams.print();
-
+    #endif
 
   	string _evtType (params["evtType"]);
 
@@ -139,10 +137,7 @@ int main(int argc, char *argv[])
   	}
 
 
-  	evtReader->readEvtFile(selectionFilename, templateFilename, readerParams);
-
-
-
+    evtReader->readEvtFile(selectionFilename, templateFilename, readerParams);
 
 
   	int status = HealpixMapMaker :: EvalCountsHealpix(	params["outfile"],
@@ -150,7 +145,6 @@ int main(int argc, char *argv[])
                                           							readerParams,
                                           							healpix2WriteParams,
                                           							selectionFilename,
-                                          							//templateFilename,
                                                         _tmin,
                                                         _tmax
                                           						);
@@ -166,6 +160,14 @@ int main(int argc, char *argv[])
     {
       cout << "No errors from EvalCountsHealpix (status=" << status << ")";
     }
+
+    // Adding keyword for the reference coordinate system
+    HduHandler * hduHandlerOutFile;
+    // Adding keyword for the reference coordinate system
+    char keyname[20] = "COORDSYS";
+    char value[20] = "C       ";
+    char comment[50] = "Ecliptic, Galactic or Celestial (equatorial)";
+    hduHandlerOutFile->writeKeysValue(params["outfile"], 2, keyname, value, comment);
 
 
   	cout << endString << endl;

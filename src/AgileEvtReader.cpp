@@ -19,6 +19,7 @@ void AgileEvtReader::readEvtFile(const char * selectionFilename, const char * te
 	AgileEvtParams * agileParams = (AgileEvtParams*) evtParams;
 	agileParams->print();
 
+
 	Intervals intervals;
  	Interval intv(agileParams->tmin, agileParams->tmax);
   intervals.Add(intv);
@@ -35,21 +36,13 @@ void AgileEvtReader::readEvtFile(const char * selectionFilename, const char * te
 
 	cout << "\nString evtExpr: " << evtExpr << endl;
 
-
-	/*char selectionFilename[FLEN_FILENAME];
-    char templateFilename[FLEN_FILENAME];
-    tmpnam(selectionFilename);
-    tmpnam(templateFilename);*/
-
 	int status = selection::MakeSelection(agileParams->evtFilePath, intervals, evtExpr, selectionFilename, templateFilename);
 
 
 	if (status != 0 && status != -118) {
-        cout << endl << "AG_AgileEvtReader......................selection failed" << endl;
+        cout << endl << "[AG_AgileEvtReader] ERROR: " << status	<<" selection failed" << endl;
         FitsFile sfile(selectionFilename);
         sfile.Delete();
-        // FitsFile tfile(templateFilename);
-        // tfile.Delete();
         exit(EXIT_FAILURE);
     }
 
