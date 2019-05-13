@@ -163,7 +163,11 @@ int main(int argc, char *argv[])
 
     // Adding keyword for the reference coordinate system
     HduHandler * hduHandlerOutFile;
-    hduHandlerOutFile->writeKeysValue(params["outfile"], 2, (char *)"COORDSYS", (char *)"C       ",(char *)"Ecliptic, Galactic or Celestial (equatorial)");
+    // Adding keyword for the reference coordinate system
+    char keyname[20] = "COORDSYS";
+    char value[20] = "C       ";
+    char comment[50] = "Ecliptic, Galactic or Celestial (equatorial)";
+    hduHandlerOutFile->writeKeysValue(params["outfile"], 2, keyname, value, comment);
 
 
   	cout << endString << endl;
