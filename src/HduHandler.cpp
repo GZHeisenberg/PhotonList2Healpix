@@ -54,17 +54,26 @@ int HduHandler::readHdu(const char * evtPath){
   		cerr << "[HduHandler] ERROR moving to HDU" << endl;
   		return status;
   	}
+    #ifdef DEBUG
   	cout << "\n\n[HduHandler] Moved to hdutype " << i+1 << " of the selection file " << endl;
+    #endif
 
     if(fits_get_hdrspace(fitsptr, &keysexist, &morekeys, &status))
     {
     	cerr << "[HduHandler] ERROR getting number of the exiting keywords" << endl;
     }
 
+    #ifdef DEBUG
     cout << "[HduHandler] In the " << i+1 << " header are present " << keysexist << " keywords" << endl;
+    #endif
 
     readHduKeysValue(fitsptr, keysexist);
 
+  }
+
+
+  if (fits_close_file(fitsptr, &status)) {
+    cerr << "[HduHandler] ERROR closing file!" << endl;
   }
 
   return status;
@@ -124,7 +133,9 @@ int HduHandler::writeKeysValue(const char * evtPath, int hdutype, char * keyname
     cerr << "[HduHandler] ERROR moving to HDU" << endl;
     return status;
   }
+  #ifdef DEBUG
   cout << "\n\n[HduHandler] Moved to hdutype " << hdutype << " of the selection file " << endl;
+  #endif
 
   if (fits_write_key(fitsptr, TSTRING, keyname, value, comment, &status))
   {

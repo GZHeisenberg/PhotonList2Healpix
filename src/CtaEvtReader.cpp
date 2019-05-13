@@ -43,7 +43,7 @@ void CtaEvtReader::readEvtFile(const char *selectionFilename, const char * templ
 	int status = selection::MakeSelection(ctaParams->evtFilePath, intervals, evtExpr, selectionFilename, templateFilename);
 
 	if (status != 0 && status != -118) {
-        cout << endl << "AG_CtaEvtReader......................selection failed" << endl;
+        cout << cout << endl << "[AG_CTAEvtReader] ERROR: " << status	<<" selection failed" << endl; 
         FitsFile sfile(selectionFilename);
         sfile.Delete();
         // FitsFile tfile(templateFilename);

@@ -40,7 +40,7 @@ void AgileEvtReader::readEvtFile(const char * selectionFilename, const char * te
 
 
 	if (status != 0 && status != -118) {
-        cout << endl << "AG_AgileEvtReader......................selection failed" << endl;
+        cout << endl << "[AG_AgileEvtReader] ERROR: " << status	<<" selection failed" << endl;
         FitsFile sfile(selectionFilename);
         sfile.Delete();
         exit(EXIT_FAILURE);
