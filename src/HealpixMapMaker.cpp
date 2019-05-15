@@ -19,9 +19,12 @@ int HealpixMapMaker :: EvalCountsHealpix (const char * outfile, EvtReader * evtR
 
 	cout << "Healpix Map Maker" << endl;
 
-  long mxdim = long(healpix2WriteParams.mdim / healpix2WriteParams.mres + 0.1); // dimension (in pixels) of the map
+	// ATTUALMENTE NON USATO!!!!!!!
+	long mxdim = long(healpix2WriteParams.mdim / healpix2WriteParams.mres + 0.1); // dimension (in pixels) of the map
 
-  cout << "mdim: " << healpix2WriteParams.mdim << " mres: " << healpix2WriteParams.mres << " mxdim: " << mxdim << endl;
+	cout << "Dimension map: " << mxdim << " pixel" << endl;
+  cout << "mdim: " << healpix2WriteParams.mdim << " (degree)" << endl;
+	cout << "mres: " << healpix2WriteParams.mres << endl;
 
   int hdutype = 0;
 	int status = 0;
@@ -35,6 +38,7 @@ int HealpixMapMaker :: EvalCountsHealpix (const char * outfile, EvtReader * evtR
       cerr << "[HealpixMapMaker] ERROR opening selection file " << selectionFilename << endl;
       return status;
   }
+
 	// int fits_movabs_hdu(fitsfile *fptr, int hdunum, int *hdutype, int *status) ==> Moves to the specified absolute HDU number in the FITS file.
 	// In the case of the AGILE/CTA photon list we have 3 HDU (Primary, EVENTS and GTI). We take hdunum = 2 ==> EVENTS
 
@@ -52,6 +56,7 @@ int HealpixMapMaker :: EvalCountsHealpix (const char * outfile, EvtReader * evtR
   Healpix_Map<int> map((int)healpix2WriteParams.mres,NEST);
 
 	//initialize the healpix map to all zeros
+	cout << "Real number of map pixel: " << map.Npix() << endl;
  	for( int i = 0; i < map.Npix(); i++)
 	{
 		map[i]=0;
