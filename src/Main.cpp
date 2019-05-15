@@ -12,7 +12,6 @@
 #include "HduHandler.hpp"
 #include "AgileEvtReader.h" // -> imports EvtReader too
 #include "CtaEvtReader.h" // -> imports EvtReader too
-#include "HealpixParams.h" // to remove
 #include <PilParams.h>
 #include "HealpixMapMaker.h"
 #include "FileWriter.h"
@@ -69,11 +68,10 @@ int main(int argc, char *argv[])
     cout << endl << "INPUT PARAMETERS:" << endl;
     params.Print();
 
-    // this file is for...
+    // temporary files used for selection event phase
     char selectionFilename[FLEN_FILENAME];
     tmpnam(selectionFilename);
 
-    // this file is for...
     char templateFilename[FLEN_FILENAME];
     tmpnam(templateFilename);
 
@@ -165,7 +163,7 @@ int main(int argc, char *argv[])
     HduHandler * hduHandlerOutFile;
     // Adding keyword for the reference coordinate system
     char keyname[20] = "COORDSYS";
-    char value[20] = "C       ";
+    char value[20] = "G       ";
     char comment[50] = "Ecliptic, Galactic or Celestial (equatorial)";
     hduHandlerOutFile->writeKeysValue(params["outfile"], 2, keyname, value, comment);
 
