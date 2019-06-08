@@ -31,25 +31,19 @@ const char* endString = {
 
 
 const PilDescription paramsDescr[] = {
-    { PilString, "outfile", "Output file name" },
-    { PilString, "evtType", "Event telescope source" },
-    { PilString, "photonListPath", "Path of photon list"},
-
-
-    //i successivi 5 sono relativi alla proiezione nel cielo
-    { PilReal, "mdim", "Size of Map (degrees)" },
-    { PilReal, "mres", "Heaplix resolution (level)" },
-    { PilReal, "la", "Longitude of map center (galactic)" },
-    { PilReal, "ba", "Latitude of map center (galactic)" },
-    { PilReal, "lonpole", "Rotation of map (degrees)" },
-
-    { PilReal, "albrad", "Radius of earth albedo (degrees)" },
-    { PilInt, "phasecode", "Orbital phase code" },
-    { PilInt, "filtercode", "Event filter code" },
+    { PilString, "outfile", "Output file name. (Healpix order and Fits extension will be automatically added)" },
+    { PilString, "photon_list_type", "Event telescope source" },
+    { PilString, "photon_list_path", "Path of photon list"},
+    { PilInt, "healpix_order", "Healpix map resolution (k)" },
+    // AGILE and CTA selection parameters
     { PilReal, "tmin", "Initial time(sec)" },
     { PilReal, "tmax", "Final time(sec)" },
     { PilReal, "emin", "Min energy" },
     { PilReal, "emax", "Max energy" },
+    // only-AGILE selection parameters
+    { PilReal, "albrad", "Radius of earth albedo (degrees)" },
+    { PilInt, "phasecode", "Orbital phase code" },
+    { PilInt, "filtercode", "Event filter code" },
     { PilReal, "fovradmin", "Min off-axis angle (degrees)" },
     { PilReal, "fovradmax", "Max off-axis angle (degrees)" },
     { PilNone, "", "" }
@@ -67,6 +61,7 @@ int main(int argc, char *argv[])
 
     cout << endl << "INPUT PARAMETERS:" << endl;
     params.Print();
+    cout << endl;
 
     // temporary files used for selection event phase
     char selectionFilename[FLEN_FILENAME];
@@ -75,34 +70,40 @@ int main(int argc, char *argv[])
     char templateFilename[FLEN_FILENAME];
     tmpnam(templateFilename);
 
+    int healpix_order = params["healpix_order"];
+
+    // Creating output filename
+    string outfile = string(params["outfile"]);
+    outfile += "_k_"+to_string(healpix_order)+".fits";
 
 
-  	// Data to insert in EVT.index
+
+  	// Creating EVT.index
   	const char * evtFile = "./INDEX/EVT.index";
-    const char * _photonListPath = params["photonListPath"];
-    string _pLP(_photonListPath);
-  	double _tmin = params["tmin"];
-  	double _tmax = params["tmax"];
 
-  	// Create EVT.index
-    string input2write = _pLP +" "+ to_string(_tmin) + " " + to_string(_tmax);
+    double _tmin = params["tmin"];
+  	double _tmax = params["tmax"];
+    string plp = string(params["photon_list_path"]);
+    string input2write = plp +" "+ to_string(_tmin) + " " + to_string(_tmax);
     FileWriter :: write2File(evtFile,input2write);
-    cout << "\nEVT file created!\n"<< endl;
+    cout << "EVT file created! Content: " << input2write << endl;
+
+
+
+
 
   	EvtReader * evtReader;
   	EvtParams * readerParams; // emin, emax, phasecode, filtercode, tmin, tmax
 
-
-  	HealpixParams healpix2WriteParams(params["mdim"],params["mres"],params["la"],params["ba"], params["lonpole"]);
-
-    #ifdef DEBUG
-  	healpix2WriteParams.print();
-    #endif
-
-  	string _evtType (params["evtType"]);
+    // not used anymore
+  	//HealpixParams healpix2WriteParams(params["mdim"],healpix_order,params["la"],params["ba"], params["lonpole"]);
 
 
-  	if( _evtType == "AGILE")
+
+  	string _photon_list_type (params["photon_list_type"]);
+
+
+  	if( _photon_list_type == "AGILE")
   	{
   		cout << "AGILE selected" << endl;
 
@@ -120,7 +121,7 @@ int main(int argc, char *argv[])
                             							params["tmax"]
                             						);
   	}
-  	else if( _evtType == "CTA")
+  	else if( _photon_list_type == "CTA")
   	{
   		cout << "CTA selected" << endl;
 
@@ -138,10 +139,10 @@ int main(int argc, char *argv[])
     evtReader->readEvtFile(selectionFilename, templateFilename, readerParams);
 
 
-  	int status = HealpixMapMaker :: EvalCountsHealpix(	params["outfile"],
+  	int status = HealpixMapMaker :: EvalCountsHealpix(	outfile,
+                                                        healpix_order,
                                           							evtReader,
                                           							readerParams,
-                                          							healpix2WriteParams,
                                           							selectionFilename,
                                                         _tmin,
                                                         _tmax
@@ -154,18 +155,16 @@ int main(int argc, char *argv[])
       cout << "Errors from EvalCountsHealpix (cfitsio error=" << err_text << ")";
 
     }
-    else
-    {
-      cout << "No errors from EvalCountsHealpix (status=" << status << ")";
-    }
+
 
     // Adding keyword for the reference coordinate system
     HduHandler * hduHandlerOutFile;
+
     // Adding keyword for the reference coordinate system
-    char keyname[20] = "COORDSYS";
-    char value[20] = "G       ";
-    char comment[50] = "Ecliptic, Galactic or Celestial (equatorial)";
-    hduHandlerOutFile->writeKeysValue(params["outfile"], 2, keyname, value, comment);
+    char coordsys_keyname[20] = "COORDSYS";
+    char coordsys_value[20] = "G       ";
+    char coordsys_comment[50] = "Ecliptic, Galactic or Celestial (equatorial)";
+    hduHandlerOutFile->writeKeysValue(outfile, 2, coordsys_keyname, coordsys_value, coordsys_comment);
 
 
   	cout << endString << endl;

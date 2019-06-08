@@ -22,9 +22,10 @@ class HduHandler
 {
   public:
     HduHandler();
-    int readHdu(const char * evtPath);
+    int readHdu(string evtPath);
     int readHduKeysValue(fitsfile* fitsptr, int hdunum);
-    int writeKeysValue(const char * evtPath, int hdunum, char * keyname, char * value, char *comment);
+    int writeKeysValue(string evtPath, int hdunum, char * keyname, char * value, char *comment);
+    int updateKeysValue(string evtPath, int hdutype, char * keyname, char * value, char *comment);
 
 };
 

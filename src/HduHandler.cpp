@@ -14,7 +14,7 @@ HduHandler::HduHandler() {
 }
 
 
-int HduHandler::readHdu(const char * evtPath){
+int HduHandler::readHdu(string evtPath){
 
   int hdutype = 0;
 	int status = 0;
@@ -28,7 +28,7 @@ int HduHandler::readHdu(const char * evtPath){
 	cout << "\n[HduHandler] File path: " << evtPath <<"\n\n"<< endl;
   #endif
 
-  if (fits_open_file(&fitsptr, evtPath, READONLY, &status))
+  if (fits_open_file(&fitsptr, evtPath.c_str(), READONLY, &status))
 	{
       cerr << "[HduHandler] ERROR opening selection file " << evtPath << endl;
       return status;
@@ -106,7 +106,7 @@ int HduHandler::readHduKeysValue(fitsfile* fitsptr, int keysexist){
 
 }
 
-int HduHandler::writeKeysValue(const char * evtPath, int hdutype, char * keyname, char * value, char *comment){
+int HduHandler::writeKeysValue(string evtPath, int hdutype, char * keyname, char * value, char *comment){
 
   int status = 0;
   int hdunum = 0;
@@ -117,7 +117,7 @@ int HduHandler::writeKeysValue(const char * evtPath, int hdutype, char * keyname
   cout <<"The keyword value is: " << value << endl;
   #endif
 
-  if (fits_open_file(&fitsptr, evtPath, READWRITE, &status))
+  if (fits_open_file(&fitsptr, evtPath.c_str(), READWRITE, &status))
 	{
       cerr << "[HduHandler] ERROR opening selection file " << evtPath << endl;
       return status;
@@ -135,6 +135,49 @@ int HduHandler::writeKeysValue(const char * evtPath, int hdutype, char * keyname
   if (fits_write_key(fitsptr, TSTRING, keyname, value, comment, &status))
   {
     cerr << "[HduHandler] ERROR writing new key!" << endl;
+    return status;
+  }
+
+  if (fits_close_file(fitsptr, &status)) {
+    cerr << "[HduHandler] ERROR closing file!" << endl;
+  }
+
+  return status;
+
+
+}
+
+
+
+int HduHandler::updateKeysValue(string evtPath, int hdutype, char * keyname, char * value, char *comment){
+
+  int status = 0;
+  int hdunum = 0;
+
+  fitsfile* fitsptr;
+
+  #ifdef DEBUG
+  cout <<"The keyword value is: " << value << endl;
+  #endif
+
+  if (fits_open_file(&fitsptr, evtPath.c_str(), READWRITE, &status))
+	{
+      cerr << "[HduHandler] ERROR opening selection file " << evtPath << endl;
+      return status;
+  }
+
+  if (fits_movabs_hdu(fitsptr, hdutype, &hdunum, &status))
+  {
+    cerr << "[HduHandler] ERROR moving to HDU" << endl;
+    return status;
+  }
+  #ifdef DEBUG
+  cout << "\n\n[HduHandler] Moved to hdutype " << hdutype << " of the selection file " << endl;
+  #endif
+
+  if (fits_update_key(fitsptr, TSTRING, keyname, value, comment, &status))
+  {
+    cerr << "[HduHandler] ERROR updating new key!" << endl;
     return status;
   }
 

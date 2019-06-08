@@ -15,24 +15,27 @@ HealpixMapMaker :: HealpixMapMaker ()
 	// constructor
 }
 
-int HealpixMapMaker :: EvalCountsHealpix (const char * outfile, EvtReader * evtReader, EvtParams* evtParams, HealpixParams healpix2WriteParams, const char *selectionFilename, double tmin, double tmax) { // const char *templateFilename,
+int HealpixMapMaker :: EvalCountsHealpix (string outfile, int healpix_order, EvtReader * evtReader, EvtParams* evtParams, const char *selectionFilename, double tmin, double tmax) { // const char *templateFilename,
 
-	cout << "Healpix Map Maker" << endl;
 
-	// ATTUALMENTE NON USATO!!!!!!!
-	long mxdim = long(healpix2WriteParams.mdim / healpix2WriteParams.mres + 0.1); // dimension (in pixels) of the map
+	Healpix_Map<int> map(healpix_order, NEST);
+	for(int i = 0; i < map.Npix(); i++) map[i] = 0; // initializing with zeros
 
-	cout << "Dimension map: " << mxdim << " pixel" << endl;
-  cout << "mdim: " << healpix2WriteParams.mdim << " (degree)" << endl;
-	cout << "mres: " << healpix2WriteParams.mres << endl;
+	int nside = pow(2,healpix_order);
+
+	cout << "\n=> Creating Healpix map" << endl;
+	cout << "* Resolution (k): " << healpix_order << endl;
+	cout << "* Scheme: NEST" << endl;
+	cout << "* Nside: " << nside << endl;
+	cout << "* Number of pixels: " << map.Npix() << endl;
 
   int hdutype = 0;
 	int status = 0;
 
 
+
 	fitsfile* selectionFits;
 
-	cout << "\n[HealpixMapMaker] selectionFilename: " << selectionFilename <<"\n\n"<< endl;
   if (fits_open_file(&selectionFits, selectionFilename, READONLY, &status))
 	{
       cerr << "[HealpixMapMaker] ERROR opening selection file " << selectionFilename << endl;
@@ -47,20 +50,13 @@ int HealpixMapMaker :: EvalCountsHealpix (const char * outfile, EvtReader * evtR
 		cerr << "[HealpixMapMaker] ERROR moving to HDU" << endl;
 		return status;
 	}
-	cout << "[HealpixMapMaker] Moved to hdutype " << hdutype << " of the selection file " << selectionFilename << endl;
-
-  cout << "[HealpixMapMaker] Evaluating counts.." << endl;
 
 
-	// mres is the resolution level and NEST is chosen for seek of efficency
-  Healpix_Map<int> map((int)healpix2WriteParams.mres,NEST);
+	cout << "Moved to hdutype " << hdutype << " of the selection file " << selectionFilename << endl;
 
-	//initialize the healpix map to all zeros
-	cout << "Real number of map pixel: " << map.Npix() << endl;
- 	for( int i = 0; i < map.Npix(); i++)
-	{
-		map[i]=0;
-	}
+  cout << "Evaluating counts.." << endl;
+
+
 
 	long nrows;
 
@@ -94,22 +90,23 @@ int HealpixMapMaker :: EvalCountsHealpix (const char * outfile, EvtReader * evtR
 	// double baa = healpix2WriteParams.baa * DEG2RAD;
 	// double laa = healpix2WriteParams.laa * DEG2RAD;
 
-	cout << "The center of map coordinates should be: " << healpix2WriteParams.baa << ", " << healpix2WriteParams.laa << endl;
+	// cout << "The center of map coordinates should be: " << healpix2WriteParams.baa << ", " << healpix2WriteParams.laa << endl;
+
 
 	for ( long k = 0; k<nrows; k++ ) {
 
-			/*
-				int fits_read_col(fitsfile *fptr, int datatype, int colnum, long firstrow, long firstelem, long nelements, void *nulval, void *array, int *anynul, int *status)
 
-				Write or read elements in column number colnum, starting with row
-				firstsrow and element firstelem (if it is a vector column). firstelem
-				is ignored if it is a scalar column. The nelements number of elements
-				are read or written continuing on successive rows of the table if necessary.
-				array is the address of an array which either contains the values to be written,
-				or will hold the returned values that are read. When reading, array
-				must have been allocated large enough to hold all the returned values.
-				// nulval = NULL => no checks will be made for undefined values when reading the column.
-			*/
+				// int fits_read_col(fitsfile *fptr, int datatype, int colnum, long firstrow, long firstelem, long nelements, void *nulval, void *array, int *anynul, int *status)
+
+				// Write or read elements in column number colnum, starting with row
+				// firstsrow and element firstelem (if it is a vector column). firstelem
+				// is ignored if it is a scalar column. The nelements number of elements
+				// are read or written continuing on successive rows of the table if necessary.
+				// array is the address of an array which either contains the values to be written,
+				// or will hold the returned values that are read. When reading, array
+				// must have been allocated large enough to hold all the returned values.
+			  // nulval = NULL => no checks will be made for undefined values when reading the column.
+
 			if (fits_read_col(selectionFits, TDOUBLE, raColumn, k+1, 1, 1, NULL, &ra, NULL, &status))
 			{
 				cerr << "[HealpixMapMaker] ERROR on reading the column RA of the template file" << endl;
@@ -130,37 +127,34 @@ int HealpixMapMaker :: EvalCountsHealpix (const char * outfile, EvtReader * evtR
 			// Encodes an angular position on unitary sphere as colatitude and longitude
 			pointing point = pointing((M_PI/2)-b,l);
 			int index = map.ang2pix(point);
+			// cout << "Value of index: " << index << endl;
+			// getchar();
+
 
 			// Increment the count
 			map[index]++;
 
 	}
 
-  cout << "[HealpixMapMaker] Ending Healpix evaluation. Writing the Healpix map on file." << endl;
+	fits_close_file(selectionFits, &status);
+	cout <<"SelectionFile" << selectionFilename <<  " closed." << endl;
 
-	const char *_outfile = outfile;
-	string OutFilePath(_outfile);
-	OutFilePath = "./" + OutFilePath;
 
-	if( remove( OutFilePath.c_str() ) != 0 )
-		cout << "[HealpixMapMaker] Error deleting the file" << OutFilePath << endl;
-	else
-		cout << "[HealpixMapMaker] " << OutFilePath << " removed." << endl;
 
+	if( remove( outfile.c_str() ) == 0 )
+		cout << "Deleted old file: " << outfile << endl;
+
+
+	// for(int l=0; l<48; l++) {
+	// 	cout << "Value pixel " << l <<": " << map[l] << endl;
+	// }
 
 	fitshandle handle;
-	handle.create(OutFilePath);
+	handle.create(outfile);
 
-	write_Healpix_map_to_fits(handle,map,PLANCK_INT64);
+	write_Healpix_map_to_fits(handle, map, PLANCK_INT32);
 
-
-
-	cout << "[HealpixMapMaker] Map saved." << endl;
-
-	fits_close_file(selectionFits, &status);
-
-
-	cout <<"[HealpixMapMaker] SelectionFile" << selectionFilename <<  " closed." << endl; //" and templateFile " <<templateFilename <<
+	cout << "Map saved: " << outfile << endl;
 
   return status;
 }

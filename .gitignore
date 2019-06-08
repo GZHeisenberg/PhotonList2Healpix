@@ -31,17 +31,6 @@
 *.out
 *.app
 
-# Folders
-bin/*
-Dataset1000/*
-obj/*
-OpenCvLibs/*
-AgileRealImages/*
-MAPPE_PER_TEST/*
-test/*
-maps/*
-mapsParmi/*
-RealImages/*
 # Files
 *.cbp
 *.depend
@@ -55,11 +44,12 @@ RealImages/*
 *.exp
 *.gz
 *.fits
-src/ExpRatioEvaluator.cpp
-include/ExpRatioEvaluator.h
-include/MapConverter.h
-COMANDI_UTILI_GIT_BRANCH
-src/MapConverter.cpp
+
+
+# Project specific
+conf/ctskymap.par
+conf/ctobssim.par
 version
-run.sh
-runNoExp.sh
+bin/
+INDEX/EVT.index
+maps/

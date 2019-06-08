@@ -2,71 +2,54 @@
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/67a1b7d4dec34f42a8b0ce331d8e57c8)](https://app.codacy.com/app/GZHeisenberg/PhotonList2Healpix?utm_source=github.com&utm_medium=referral&utm_content=GZHeisenberg/PhotonList2Healpix&utm_campaign=Badge_Grade_Dashboard)
 
-The PhotonList2Healpix software takes in input a photon list (CTA or AGILE) and return as output an Healpix map.
-
-The software requires a configuration file named EVT.index placed in INDEX directory.
-This file is created at run-time using following input parameters:
-
-	- photonListPath ( "./EVT_MAPS/ag1608151200_1608311200_STD1Kal_FM.EVT.gz" )
-
-	- tmin ( 398347132 )
-
-	- tmax ( 399729532 )
+The PhotonList2Healpix software takes in input a photon list (CTA or AGILE) and returns as output an Healpix map with a given resolution ("order" or "k") and NEST pixelization scheme.
 
 ## Dependencies
 
 The following dependencies are needed:
 
-	* cfitsio
-	* pil
-	* agile
-	* healpix-3.31-cxx
+	* cfitsio-3.370
+	* agile-B24-r5
+	* healpix-3.31
 
-## Use
-
-On inaf server load the following modues:
-
-	module load agile-B24-r5
-	module load healpix-3.31-cxx
-
-Export path to pil params file configuration
+## Usage
 
 ```bash
-	 export PFILES=~/PhotonList2HealpixTask/PhotonList2Healpix/conf
+	module load agile-B24-r5
+	module load healpix-3.31-cxx
+	export PFILES=~/PhotonList2HealpixTask/PhotonList2Healpix/conf
 ```
 
 ### Input
 
-	outfile: HEALPix output file name;
+	outfile: the filename of the output file.
 
-	evtType: indicates if the input photon list is AGILE or CTA;
+	photon_list_type: the format of the photon list.
 
-	photonListPath: indicates the input photon list path;
+	photon_list_path: the path to the photon list.
 
-	mdim: indicates the HEALPix output map size (expressed in degrees);
+	healpix_order: the resolution of the Healpix map.
 
-	mres: indicates the HEALPix output map resolution;
 
-	la: indicates the longitudinal coordinate of the center of the HEALPix output map;
 
-	ba: indicates the latitude coordinate of the center of the HEALPix output map;
 
-	lonpole: indicates the rotation of the HEALPix map (expressed in degrees);
+	tmin: observation start time for the photons selection (AGILE and CTA).
 
-	albrad: radius of earth albedo (expressed in degrees);
+	tmax: observation end time for the photons selection (AGILE and CTA).
 
-	phasecode: orbital phase code;
+	emin: the minimum energy of the events for the photons selection (AGILE and CTA).
 
-	filtercode: code used to select the particular event type ( 0 to select all photon list event, used for CTA photon list, 5 to select only gamma event, used for AGILE photon list);
+	emax: the maximum energy of the events for the photons selection (AGILE and CTA).
 
-	tmin: observation start time ( selection parameter to apply at the photon list );
 
-	tmax: observation end time ( selection parameter to apply at the photon list );
 
-	emin: the minimum observation energy of the events ( selection parameter to apply at the photon list );
 
-	emax: the maximum observation energy of the events ( selection parameter to apply at the photon list );
+	albrad: radius of earth albedo (expressed in degrees) for the photons selection (AGILE only).
 
-	fovradmin: Min off-axis angle ( expressed in degrees);
+	phasecode: orbital phase code for the photons selection (AGILE only).
 
-	fovradmax: Max off-axis angle (expressed in degrees);
+	filtercode: code used to select the particular event type (5 to select only gamma events) for the photons selection (AGILE only).
+
+	fovradmin: Min off-axis angle (expressed in degrees) for the photons selection (AGILE only).
+
+	fovradmax: Max off-axis angle (expressed in degrees) for the photons selection (AGILE only).
