@@ -1,4 +1,5 @@
 outfile,s,ql,"HealpixMap.fits",,,"Output file name. (the Healpix order and Fits extension will be automatically added)"
+outfolder,s,ql,"ph_to_healpix_out/",,,"The name of the output folder"
 photon_list_type,s,q, "AGILE",,,"Event telescope source"
 photon_list_path,s,ql,"./EVT_MAPS/ag1608151200_1608311200_STD1Kal_FM.EVT.gz",,,"Path of photon list"
 healpix_order,i,ql,8,,,"Healpix map resolution (k)"
