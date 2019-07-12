@@ -35,6 +35,7 @@ const PilDescription paramsDescr[] = {
     { PilString, "photon_list_type", "Event telescope source" },
     { PilString, "photon_list_path", "Path of photon list"},
     { PilInt, "healpix_order", "Healpix map resolution (k)" },
+    { PilString, "healpix_schema", "Healpix map schema"},
     // AGILE and CTA selection parameters
     { PilReal, "tmin", "Initial time(sec)" },
     { PilReal, "tmax", "Final time(sec)" },
@@ -71,6 +72,7 @@ int main(int argc, char *argv[])
     tmpnam(templateFilename);
 
     int healpix_order = params["healpix_order"];
+    string healpix_schema = string(params["healpix_schema"]);
 
     // Creating output filename
     string outfile = string(params["outfile"]);
@@ -141,6 +143,7 @@ int main(int argc, char *argv[])
 
   	int status = HealpixMapMaker :: EvalCountsHealpix(	outfile,
                                                         healpix_order,
+                                                        healpix_schema,
                                           							evtReader,
                                           							readerParams,
                                           							selectionFilename,

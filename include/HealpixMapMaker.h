@@ -16,11 +16,14 @@
 #include <healpix_map_fitsio.h>
 #include <Selection.h>
 #include <Eval.h>
+#include <string>
+#include <cstring>
 
 #include "EvtReader.h"
 #include "EvtParams.h"
 #include "HealpixParams.h"
 #include "FitsUtils.h"
+
 
 
 using namespace std;
@@ -31,7 +34,7 @@ class HealpixMapMaker
 {
 	public:
 
-		static int EvalCountsHealpix(string outfile, int healpix_order, EvtReader * evtReader, EvtParams* evtParams, const char *selectionFilename, double tmin, double tmax); //const char *templateFilename,
+		static int EvalCountsHealpix(string outfile, int healpix_order, string healpix_schema, EvtReader * evtReader, EvtParams* evtParams, const char *selectionFilename, double tmin, double tmax); //const char *templateFilename,
 
 	private:
 

@@ -15,17 +15,30 @@ HealpixMapMaker :: HealpixMapMaker ()
 	// constructor
 }
 
-int HealpixMapMaker :: EvalCountsHealpix (string outfile, int healpix_order, EvtReader * evtReader, EvtParams* evtParams, const char *selectionFilename, double tmin, double tmax) { // const char *templateFilename,
+int HealpixMapMaker :: EvalCountsHealpix (string outfile, int healpix_order, string healpix_schema, EvtReader * evtReader, EvtParams* evtParams, const char *selectionFilename, double tmin, double tmax) { // const char *templateFilename,
 
+	Healpix_Map<int> map;
+	cout << "Healpix order: "<< healpix_order<< endl;
+	if(healpix_schema=="NEST")
+	{
+		map.Set(healpix_order, NEST);
+		cout << "Healpix order: "<< healpix_order<< endl;
+		// for(int i = 0; i < map.Npix(); i++) map[i] = 0; // initializing with zeros
+	}
+	else
+	{
+		map.Set(healpix_order, RING);
+		cout << "Healpix order: "<< healpix_order<< endl;
+	}
 
-	Healpix_Map<int> map(healpix_order, NEST);
 	for(int i = 0; i < map.Npix(); i++) map[i] = 0; // initializing with zeros
-
+	cout << "Healpix order: "<< healpix_order<< endl;
 	int nside = pow(2,healpix_order);
+	cout << "Healpix order: "<< healpix_order<< endl;
 
 	cout << "\n=> Creating Healpix map" << endl;
 	cout << "* Resolution (k): " << healpix_order << endl;
-	cout << "* Scheme: NEST" << endl;
+	cout << "* Scheme: "<< healpix_schema << endl;
 	cout << "* Nside: " << nside << endl;
 	cout << "* Number of pixels: " << map.Npix() << endl;
 
