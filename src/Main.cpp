@@ -8,6 +8,9 @@
 */
 
 #include <string>
+#include <bits/stdc++.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include "HduHandler.hpp"
 #include "AgileEvtReader.h" // -> imports EvtReader too
@@ -32,6 +35,7 @@ const char* endString = {
 
 const PilDescription paramsDescr[] = {
     { PilString, "outfile", "Output file name. (Healpix order and Fits extension will be automatically added)" },
+    { PilString, "outfolder", "The name of the output folder" },
     { PilString, "photon_list_type", "Event telescope source" },
     { PilString, "photon_list_path", "Path of photon list"},
     { PilInt, "healpix_order", "Healpix map resolution (k)" },
@@ -75,12 +79,25 @@ int main(int argc, char *argv[])
     string healpix_schema = string(params["healpix_schema"]);
 
     // Creating output filename
+    string outfolder = string(params["outfolder"]);
     string outfile = string(params["outfile"]);
+    outfile += "_t_"+to_string((double)params["tmin"])+"_"+to_string((double)params["tmax"]);
+    outfile += "_e_"+to_string((double)params["emin"])+"_"+to_string((double)params["emax"]);
     outfile += "_k_"+to_string(healpix_order)+".fits";
 
+    outfile = outfolder+"/"+outfile;
 
+    cout << "* Output filename: " << outfile << endl;
 
-  	// Creating EVT.index
+    // Creating the INDEX directory
+    if (mkdir("./INDEX", 0777) != -1)
+      cout << "* INDEX directory created" << endl;
+
+    // Creating the INDEX directory
+    if (mkdir(outfolder.c_str(), 0777) != -1)
+      cout << "* Output "<<outfolder<<" directory created" << endl;
+
+    // Creating EVT.index
   	const char * evtFile = "./INDEX/EVT.index";
 
     double _tmin = params["tmin"];
@@ -88,7 +105,7 @@ int main(int argc, char *argv[])
     string plp = string(params["photon_list_path"]);
     string input2write = plp +" "+ to_string(_tmin) + " " + to_string(_tmax);
     FileWriter :: write2File(evtFile,input2write);
-    cout << "EVT file created! Content: " << input2write << endl;
+    cout << "* EVT file created! Content: " << input2write << endl;
 
 
 
