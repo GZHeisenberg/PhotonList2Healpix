@@ -2,7 +2,7 @@ outfile,s,ql,"HealpixMap.fits",,,"Output file name. (the Healpix order and Fits 
 outfolder,s,ql,"ph_to_healpix_out/",,,"The name of the output folder"
 photon_list_type,s,q, "AGILE",,,"Event telescope source"
 photon_list_path,s,ql,"./EVT_MAPS/ag1608151200_1608311200_STD1Kal_FM.EVT.gz",,,"Path of photon list"
-healpix_order,i,ql,8,,,"Healpix map resolution (k)"
+healpix_order,i,ql,7,,,"Healpix map resolution (k)"
 healpix_schema,s,ql, "NEST",,,"Healpix map schema"
 tmin,r,ql,398347132,,,"Initial time(sec)"
 tmax,r,ql,399729532,,,"Final time(sec)"

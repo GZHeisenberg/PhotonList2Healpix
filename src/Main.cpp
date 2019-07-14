@@ -71,12 +71,21 @@ int main(int argc, char *argv[])
     // temporary files used for selection event phase
     char selectionFilename[FLEN_FILENAME];
     tmpnam(selectionFilename);
+    // mkstemp(selectionFilename);
 
     char templateFilename[FLEN_FILENAME];
     tmpnam(templateFilename);
+    // mkstemp(templateFilename);
 
     int healpix_order = params["healpix_order"];
     string healpix_schema = string(params["healpix_schema"]);
+
+    if( (healpix_schema!="RING") && (healpix_schema!="NEST") )
+    {
+      cout<< healpix_schema<< endl;
+      cerr << "ERROR! Healpix map schema not valid!"<<endl;
+  		exit(-1);
+    }
 
     // Creating output filename
     string outfolder = string(params["outfolder"]);
@@ -124,7 +133,7 @@ int main(int argc, char *argv[])
 
   	if( _photon_list_type == "AGILE")
   	{
-  		cout << "AGILE selected" << endl;
+  		// cout << "AGILE selected" << endl;
 
   		evtReader    = new AgileEvtReader();
 
@@ -142,7 +151,7 @@ int main(int argc, char *argv[])
   	}
   	else if( _photon_list_type == "CTA")
   	{
-  		cout << "CTA selected" << endl;
+  		// cout << "CTA selected" << endl;
 
   		evtReader = new CtaEvtReader();
 

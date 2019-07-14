@@ -28,27 +28,27 @@ LINKERENV= cfitsio, pil, wcs, agile, healpix
 AG_EXE = PhotonList2Healpix
 
 # Libraries
-AGILE_MAP = AgileMap
-ALIKE_DATA5 = AlikeData5
-ALIKE_PSF = AlikePsf
-CALIBUTILS = CalibUtils
-CONNECTED_REGION = ConnectedRegion
-ELLIPSE = Ellipse
-FITSUTILS = FitsUtils
-GENMAPPARAMS = GenmapParams
-INTERVALS = Intervals
-LABELING = Labeling
-MATH_UTILS = MathUtils
-PIL_PARAMS = PilParams
-PLOT_CTS2D = PlotCts2D3
-POLYGON = Polygon
-ROI_MULTI5 = RoiMulti5
-ROTATION = Rotation
-SKYMAP = SkyMap
-
+# AGILE_MAP = AgileMap
+# ALIKE_DATA5 = AlikeData5
+# ALIKE_PSF = AlikePsf
+# CALIBUTILS = CalibUtils
+# CONNECTED_REGION = ConnectedRegion
+# ELLIPSE = Ellipse
+# FITSUTILS = FitsUtils
+# GENMAPPARAMS = GenmapParams
+# INTERVALS = Intervals
+# LABELING = Labeling
+# MATH_UTILS = MathUtils
+# PIL_PARAMS = PilParams
+# PLOT_CTS2D = PlotCts2D3
+# POLYGON = Polygon
+# ROI_MULTI5 = RoiMulti5
+# ROTATION = Rotation
+# SKYMAP = SkyMap
+#
 VER_FILE_NAME = version.h
 #the name of the directory where the conf file are copied (into $(datadir))
-CONF_DEST_DIR =
+CONF_DEST_DIR = conf
 #the name of the icon for the installation
 ICON_NAME=
 
@@ -60,11 +60,11 @@ exec_prefix=$(prefix)
 # The directory to install the binary files in.
 bindir=$(exec_prefix)/bin
 # The directory to install the local configuration file.
-# datadir=$(exec_prefix)/share
+datadir=$(exec_prefix)/share
 # The directory to install the libraries in.
-libdir=$(exec_prefix)/lib
+# libdir=$(exec_prefix)/lib
 # The directory to install the info files in.
-infodir=$(exec_prefix)/info
+# infodir=$(exec_prefix)/info
 # The directory to install the include files in.
 includedir=$(exec_prefix)/include
 # The directory to install the icon
@@ -75,8 +75,8 @@ icondir=$(HOME)/.local/share/applications/
 OBJECTS_DIR = obj
 SOURCE_DIR = src
 INCLUDE_DIR = include
-DOC_DIR = ref
-DOXY_SOURCE_DIR = code_filtered
+# DOC_DIR = ref
+# DOXY_SOURCE_DIR = code_filtered
 EXE_DESTDIR  = bin
 LIB_DESTDIR = lib
 CONF_DIR=conf
@@ -129,7 +129,7 @@ ifneq (, $(findstring healpix, $(LINKERENV)))
     ifeq (,$(findstring -I $(HEALPIX_INCDIR), $(CXXFLAGS)))
         CXXFLAGS += -I $(HEALPIX_INCDIR)
     endif
-    LIBS += -L$(HEALPIX_LIBDIR) -lhealpix_cxx -lsharp -lfftpack -lcxxsupport -lc_utils
+    LIBS += -L$(HEALPIX_LIBDIR) -lhealpix_cxx -lsharp -lcxxsupport -lc_utils	#-lfftpack
 endif
 
 LINK     = $(CXX)

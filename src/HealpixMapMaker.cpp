@@ -18,23 +18,18 @@ HealpixMapMaker :: HealpixMapMaker ()
 int HealpixMapMaker :: EvalCountsHealpix (string outfile, int healpix_order, string healpix_schema, EvtReader * evtReader, EvtParams* evtParams, const char *selectionFilename, double tmin, double tmax) { // const char *templateFilename,
 
 	Healpix_Map<int> map;
-	cout << "Healpix order: "<< healpix_order<< endl;
+	
 	if(healpix_schema=="NEST")
 	{
 		map.Set(healpix_order, NEST);
-		cout << "Healpix order: "<< healpix_order<< endl;
-		// for(int i = 0; i < map.Npix(); i++) map[i] = 0; // initializing with zeros
 	}
-	else
+	else if(healpix_schema=="RING")
 	{
 		map.Set(healpix_order, RING);
-		cout << "Healpix order: "<< healpix_order<< endl;
 	}
 
 	for(int i = 0; i < map.Npix(); i++) map[i] = 0; // initializing with zeros
-	cout << "Healpix order: "<< healpix_order<< endl;
 	int nside = pow(2,healpix_order);
-	cout << "Healpix order: "<< healpix_order<< endl;
 
 	cout << "\n=> Creating Healpix map" << endl;
 	cout << "* Resolution (k): " << healpix_order << endl;
@@ -99,13 +94,6 @@ int HealpixMapMaker :: EvalCountsHealpix (string outfile, int healpix_order, str
 
 	double ra, dec, l, b = 0;	//the,, x, y, i, ii = 0
 
-	// This represent the coordinates of map center but at the moment are not used!
-	// double baa = healpix2WriteParams.baa * DEG2RAD;
-	// double laa = healpix2WriteParams.laa * DEG2RAD;
-
-	// cout << "The center of map coordinates should be: " << healpix2WriteParams.baa << ", " << healpix2WriteParams.laa << endl;
-
-
 	for ( long k = 0; k<nrows; k++ ) {
 
 
@@ -140,9 +128,6 @@ int HealpixMapMaker :: EvalCountsHealpix (string outfile, int healpix_order, str
 			// Encodes an angular position on unitary sphere as colatitude and longitude
 			pointing point = pointing((M_PI/2)-b,l);
 			int index = map.ang2pix(point);
-			// cout << "Value of index: " << index << endl;
-			// getchar();
-
 
 			// Increment the count
 			map[index]++;
@@ -157,10 +142,6 @@ int HealpixMapMaker :: EvalCountsHealpix (string outfile, int healpix_order, str
 	if( remove( outfile.c_str() ) == 0 )
 		cout << "Deleted old file: " << outfile << endl;
 
-
-	// for(int l=0; l<48; l++) {
-	// 	cout << "Value pixel " << l <<": " << map[l] << endl;
-	// }
 
 	fitshandle handle;
 	handle.create(outfile);
