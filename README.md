@@ -55,3 +55,38 @@ export PFILES=~/PhotonList2HealpixTask/PhotonList2Healpix/conf
 	fovradmin: Min off-axis angle (expressed in degrees) for the photons selection (AGILE only). [default = 0]
 
 	fovradmax: Max off-axis angle (expressed in degrees) for the photons selection (AGILE only). [default = 60]
+
+
+
+### How the qeury string is formed
+
+```
+str << "TIME >= " << tmin;
+str << "TIME < " << tmax;
+str << " && ENERGY >= " << emin;
+str << " && ENERGY <= " << emax;
+str << " && PH_EARTH > " << albrad;
+str << " && THETA < " << fovradmax;
+str << " && THETA >= " << fovradmin;
+if ((phasecode & 1) == 1)
+		str << " && PHASE .NE. 0";
+if ((phasecode & 2) == 2)
+		str << " && PHASE .NE. 1";
+if ((phasecode & 4) == 4)
+		str << " && PHASE .NE. 2";
+if ((phasecode & 8) == 8)
+		str << " && PHASE .NE. 3";
+if ((phasecode & 16) == 16)
+		str << " && PHASE .NE. 4";
+if ((filtercode & 1) == 1)
+		str << " && EVSTATUS .NE. 'L'";
+if ((filtercode & 2) == 2)
+		str << " && EVSTATUS .NE. 'G'";
+if ((filtercode & 4) == 4)
+		str << " && EVSTATUS .NE. 'S'";
+```
+
+Example:
+```
+TIME >= 0.000000 && TIME < 9999999999.000000 && ENERGY >= 0 && ENERGY <= 1e+10 && PH_EARTH > 80 && THETA < 60 && THETA >= 0 && PHASE .NE. 1 && PHASE .NE. 2 && EVSTATUS .NE. 'L' && EVSTATUS .NE. 'S'
+```

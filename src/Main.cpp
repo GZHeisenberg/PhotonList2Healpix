@@ -41,10 +41,10 @@ const PilDescription paramsDescr[] = {
     { PilInt, "healpix_order", "Healpix map resolution (k)" },
     { PilString, "healpix_schema", "Healpix map schema"},
     // AGILE and CTA selection parameters
-    { PilReal, "tmin", "Initial time(sec)" },
-    { PilReal, "tmax", "Final time(sec)" },
-    { PilReal, "emin", "Min energy" },
-    { PilReal, "emax", "Max energy" },
+    { PilReal, "tmin", "Initial time(sec). Put -1 to ignore the time lower bound." },
+    { PilReal, "tmax", "Final time(sec). Put -1 to ignore the time upper bound." },
+    { PilReal, "emin", "Min energy. Put -1 to ignore the energy lower bound." },
+    { PilReal, "emax", "Max energy. Put -1 to ignore the energy upper bound." },
     // only-AGILE selection parameters
     { PilReal, "albrad", "Radius of earth albedo (degrees)" },
     { PilInt, "phasecode", "Orbital phase code" },
@@ -84,14 +84,25 @@ int main(int argc, char *argv[])
     {
       cout<< healpix_schema<< endl;
       cerr << "ERROR! Healpix map schema not valid!"<<endl;
-  		exit(-1);
+  		exit(1);
     }
+
+    double tmin = params["tmin"];
+  	double tmax = params["tmax"];
+    if (tmin == -1) tmin = 0;
+    if (tmax == -1) tmax = 9999999999;
+
+    double emin = params["emin"];
+  	double emax = params["emax"];
+    if (emin == -1) emin = 0;
+    if (emax == -1) emax = 9999999999;
+
 
     // Creating output filename
     string outfolder = string(params["outfolder"]);
     string outfile = string(params["outfile"]);
-    outfile += "_t_"+to_string((double)params["tmin"])+"_"+to_string((double)params["tmax"]);
-    outfile += "_e_"+to_string((double)params["emin"])+"_"+to_string((double)params["emax"]);
+    outfile += "_t_"+to_string(tmin)+"_"+to_string(tmax);
+    outfile += "_e_"+to_string(emin)+"_"+to_string(emax);
     outfile += "_k_"+to_string(healpix_order)+".fits";
 
     outfile = outfolder+"/"+outfile;
@@ -109,15 +120,12 @@ int main(int argc, char *argv[])
     // Creating EVT.index
   	const char * evtFile = "./INDEX/EVT.index";
 
-    double _tmin = params["tmin"];
-  	double _tmax = params["tmax"];
+
+
     string plp = string(params["photon_list_path"]);
-    string input2write = plp +" "+ to_string(_tmin) + " " + to_string(_tmax);
+    string input2write = plp +" "+ to_string(tmin) + " " + to_string(tmax);
     FileWriter :: write2File(evtFile,input2write);
     cout << "* EVT file created! Content: " << input2write << endl;
-
-
-
 
 
   	EvtReader * evtReader;
@@ -135,18 +143,18 @@ int main(int argc, char *argv[])
   	{
   		// cout << "AGILE selected" << endl;
 
-  		evtReader    = new AgileEvtReader();
+  		evtReader     = new AgileEvtReader();
 
   		readerParams  = new AgileEvtParams( evtFile,
-                            							params["emin"],
-                            							params["emax"],
+                            							emin,
+                                          emax,
                             							params["albrad"],
                             							params["fovradmin"],
                             							params["fovradmax"],
                             							params["phasecode"],
                             							params["filtercode"],
-                            							params["tmin"],
-                            							params["tmax"]
+                            							tmin,
+                            							tmax
                             						);
   	}
   	else if( _photon_list_type == "CTA")
@@ -156,10 +164,10 @@ int main(int argc, char *argv[])
   		evtReader = new CtaEvtReader();
 
   		readerParams = new CtaEvtParams(	evtFile,
-                          							params["emin"],
-                          							params["emax"],
-                          							params["tmin"],
-                          							params["tmax"]
+                          							emin,
+                          							emax,
+                          							tmin,
+                          							tmax
                           						);
   	}
 
@@ -173,8 +181,8 @@ int main(int argc, char *argv[])
                                           							evtReader,
                                           							readerParams,
                                           							selectionFilename,
-                                                        _tmin,
-                                                        _tmax
+                                                        tmin,
+                                                        tmax
                                           						);
 
     if(status > 0)
