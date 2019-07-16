@@ -37,7 +37,8 @@ const PilDescription paramsDescr[] = {
     { PilString, "outfile", "Output file name. (Healpix order and Fits extension will be automatically added)" },
     { PilString, "outfolder", "The name of the output folder" },
     { PilString, "photon_list_type", "Event telescope source" },
-    { PilString, "photon_list_path", "Path of photon list"},
+    // { PilString, "photon_list_path", "Path of photon list"},
+    { PilString, "EVT_path", "Path of EVT.index file"},
     { PilInt, "healpix_order", "Healpix map resolution (k)" },
     { PilString, "healpix_schema", "Healpix map schema"},
     // AGILE and CTA selection parameters
@@ -113,29 +114,26 @@ int main(int argc, char *argv[])
     if (mkdir("./INDEX", 0777) != -1)
       cout << "* INDEX directory created" << endl;
 
-    // Creating the INDEX directory
+    // Creating the output_folder directory
     if (mkdir(outfolder.c_str(), 0777) != -1)
       cout << "* Output "<<outfolder<<" directory created" << endl;
 
     // Creating EVT.index
-  	const char * evtFile = "./INDEX/EVT.index";
+  	const char * evtFile = params["EVT_path"];//= "./INDEX/EVT.index";
+    cout <<"evtFile path:"<<evtFile<<endl;
 
 
 
-    string plp = string(params["photon_list_path"]);
-    string input2write = plp +" "+ to_string(tmin) + " " + to_string(tmax);
-    FileWriter :: write2File(evtFile,input2write);
-    cout << "* EVT file created! Content: " << input2write << endl;
+    // string plp = string(params["photon_list_path"]);
+    // string input2write = plp +" "+ to_string(tmin) + " " + to_string(tmax);
+    // FileWriter :: write2File(evtFile,input2write);
+    // cout << "* EVT file created! Content: " << input2write << endl;
 
 
   	EvtReader * evtReader;
   	EvtParams * readerParams; // emin, emax, phasecode, filtercode, tmin, tmax
 
-    // not used anymore
-  	//HealpixParams healpix2WriteParams(params["mdim"],healpix_order,params["la"],params["ba"], params["lonpole"]);
-
-
-
+    
   	string _photon_list_type (params["photon_list_type"]);
 
 

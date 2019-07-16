@@ -18,7 +18,7 @@ HealpixMapMaker :: HealpixMapMaker ()
 int HealpixMapMaker :: EvalCountsHealpix (string outfile, int healpix_order, string healpix_schema, EvtReader * evtReader, EvtParams* evtParams, const char *selectionFilename, double tmin, double tmax) { // const char *templateFilename,
 
 	Healpix_Map<int> map;
-	
+
 	if(healpix_schema=="NEST")
 	{
 		map.Set(healpix_order, NEST);
@@ -72,6 +72,7 @@ int HealpixMapMaker :: EvalCountsHealpix (string outfile, int healpix_order, str
 		cerr << "[HealpixMapMaker] ERROR counting the number of rows from selection file "<< selectionFilename << endl;
 		return status;
 	}
+	cout << "nrows = " << nrows << endl;
 
 	int raColumn, decColumn;
 	if (fits_get_colnum(selectionFits, 1, (char*)"RA", &raColumn, &status)) // int fits_get_colnum(fitsfile *fptr, int casesen, char *template, int *colnum, int *status)
