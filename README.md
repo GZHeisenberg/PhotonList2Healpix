@@ -5,7 +5,7 @@
 The PhotonList2Healpix software takes in input one or more photon lists (CTA or AGILE) and returns as output an Healpix map with a given resolution ("order" or "k") and NEST or RING pixelization scheme.
 This tool requires an EVT.index configuration file which contains one or more photon list paths with theire corresponding observation interval times.
 
-##EVT.idex (example)
+## EVT.idex (example)
 
 ```
 /path/to/CTA_PhotonList/GRB-photon-list/run0406_sim000001_tbin00.fits 0.000000 0.11294627190
